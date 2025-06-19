@@ -1,18 +1,19 @@
-const express = require("express");
-const app = express();
-const fileRoutes = require("./routes/fileRoutes");
-const fs = require("fs");
+// // const express = require("express");
+// // const app = express();
+// // const fileRoutes = require("./routes/fileRoutes");
+// // const fs = require("fs");
 
-if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+// // if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 
-app.use(express.json());
+// // app.use(express.json());
 
-app.use("/", fileRoutes);
+// // app.use("/", fileRoutes);
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// // //http://localhost:5050
+// // const PORT = 5050;
+// // app.listen(PORT, () => {
+// //   console.log(`Server running on :${PORT}`);
+// // });
 
 // const express = require("express");
 // const multer = require("multer");
@@ -62,7 +63,6 @@ app.listen(PORT, () => {
 
 // app.get("/files", (req, res) => {
 //   const directoryPath = path.join(__dirname, "uploads");
-
 //   fs.readdir(directoryPath, (err, files) => {
 //     if (err) {
 //       return res.status(500).send("حدث خطأ في قراءة الملفات");
@@ -492,3 +492,15 @@ app.listen(PORT, () => {
 //     res.status(500).send("حدث خطأ أثناء استخراج المحتوى");
 //   }
 // });
+
+const express = require("express");
+const app = express();
+const fileRoutes = require("./routes/fileRoutes");
+const PORT = 3000;
+
+app.use(express.json());
+app.use("/", fileRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
