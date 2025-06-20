@@ -50,24 +50,45 @@ exports.extractFileContent = async (req, res) => {
 };
 
 // تحليل نص للعثور على كلمات متكررة
-exports.analyzeFile = (req, res) => {
-  const text = req.body.text;
-  if (!text) return res.status(400).send("يرجى إرسال النص");
+exports.analyzeFile = async (req, res) => {
+  const filename = req.query.filename;
+  if (!filename) return res.status(400).send("يرجى تحديد اسم الملف");
 
-  const words = text.toLowerCase().match(/\b\w+\b/g);
-  const wordCounts = {};
+  const filePath = path.join(__dirname, "..", "uploads", filename);
 
-  words.forEach((word) => {
-    wordCounts[word] = (wordCounts[word] || 0) + 1;
-  });
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("الملف غير موجود");
+  }
 
-  const sorted = Object.entries(wordCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([word, count]) => ({ word, count }));
+  try {
+    let text = "";
 
-  res.json(sorted.slice(0, 20)); // أعلى 20 كلمة
+    if (filename.endsWith(".docx")) {
+      const result = await mammoth.extractRawText({ path: filePath });
+      text = result.value;
+    } else if (filename.endsWith(".pdf")) {
+      const dataBuffer = fs.readFileSync(filePath);
+      const data = await pdfParse(dataBuffer);
+      text = data.text;
+    } else {
+      return res.status(400).send("نوع الملف غير مدعوم");
+    }
+
+    const words = text.toLowerCase().match(/\b\w+\b/g);
+    const wordCounts = {};
+    words.forEach((word) => {
+      wordCounts[word] = (wordCounts[word] || 0) + 1;
+    });
+
+    const sorted = Object.entries(wordCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([word, count]) => ({ word, count }));
+
+    res.json(sorted.slice(0, 20));
+  } catch (err) {
+    res.status(500).send("حدث خطأ أثناء معالجة الملف");
+  }
 };
-
 // البحث في جميع الملفات
 exports.searchInFiles = async (req, res) => {
   const query = req.query.q?.toLowerCase();

@@ -28,7 +28,7 @@ router.post("/upload", upload.single("file"), fileController.uploadFile);
 router.get("/files", fileController.listFiles);
 router.get("/files/:filename", fileController.serveFile);
 router.get("/extract/:filename", fileController.extractFileContent);
-router.post("/analyze", fileController.analyzeFile);
+router.get("/analyze", fileController.analyzeFile);
 router.get("/search", fileController.searchInFiles);
 router.get("/stats", fileController.getStats);
 router.get("/title/:filename", fileController.getFileTitle);
